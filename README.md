@@ -1,4 +1,5 @@
 # PI-Tracker
-A tracker DLL which enables 'NTAPI->Syscall' tracking whenever it is loaded. It calls 'NtSetInformationProcess' API call with a callback hook and 'ProcessInstrumentationCallback' class to track all syscalls being performed via the userland.
+
+A tracker DLL that enables '`NTAPI->Syscall`' tracking whenever it is loaded. It calls '`NtSetInformationProcess`' API call with a callback hook and '`ProcessInstrumentationCallback`' class. Once this is executed, everytime an NTAPI->Syscall is called, before returning from the kernel to the return address of the syscall, the kernel makes a jump to the userland callback hook ('`hookedCallback`'). One thing I noticed when this hook was executed, was that the '`R10`' register contains the original return address of the syscall. And since every syscall return address (in windows 10) is 0x14 bytes away from the actual NTAPI instruction, I can just subtract and find the NTAPI pointer. Once I have this, I can walk through the Export Address Table (EAT) of the '`ntdll.dll`' to find which API was called by doing an ordinal comparison. 
 
 A detailed blog on this can be found on bruteratel.com
